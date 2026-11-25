@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xCloud Keyboard Gamepad
 // @namespace    https://github.com/subscriptions-dot/xcloud-keyboard-gamepad
-// @version      2.1.0
+// @version      2.2.0
 // @description  Play any Xbox Cloud Gaming game (play.xbox.com) with keyboard and mouse. Adds a virtual controller, no real gamepad needed.
 // @license      MIT
 // @match        https://play.xbox.com/*
@@ -41,19 +41,27 @@
   // Standard gamepad button indexes
   const B = { A: 0, B: 1, X: 2, Y: 3, LB: 4, RB: 5, LT: 6, RT: 7, VIEW: 8, MENU: 9, LS: 10, RS: 11, UP: 12, DOWN: 13, LEFT: 14, RIGHT: 15 };
 
+  // Arrow keys work exactly like W A S D (left stick, and gas/brake in racing).
+  // D-pad is on I J K L.
   const COMMON = {
     Enter: B.A, Backspace: B.B, Tab: B.MENU, KeyG: B.VIEW,
-    ArrowUp: B.UP, ArrowDown: B.DOWN, ArrowLeft: B.LEFT, ArrowRight: B.RIGHT,
+    KeyI: B.UP, KeyK: B.DOWN, KeyJ: B.LEFT, KeyL: B.RIGHT,
   };
   const RACING = {
-    KeyW: B.RT, KeyS: B.LT, Space: B.A, KeyQ: B.X, KeyE: B.Y,
+    KeyW: B.RT, ArrowUp: B.RT, KeyS: B.LT, ArrowDown: B.LT,
+    Space: B.A, KeyQ: B.X, KeyE: B.Y,
     ShiftLeft: B.RB, ControlLeft: B.LB, KeyR: B.RS,
   };
   const SHOOTER = {
     Space: B.A, KeyC: B.B, KeyR: B.X, KeyE: B.Y, KeyQ: B.LB, KeyF: B.RB,
     ShiftLeft: B.LS, KeyV: B.RS,
   };
-  const STICK_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD'];
+  const UP_KEYS = ['KeyW', 'ArrowUp'];
+  const DOWN_KEYS = ['KeyS', 'ArrowDown'];
+  const LEFT_KEYS = ['KeyA', 'ArrowLeft'];
+  const RIGHT_KEYS = ['KeyD', 'ArrowRight'];
+  const STICK_KEYS = [].concat(UP_KEYS, DOWN_KEYS, LEFT_KEYS, RIGHT_KEYS);
+  const held = (list) => list.some((k) => S.keys.has(k));
 
   const S = { on: false, mode: 'racing', rx: 0, ry: 0, keys: new Set(), lmb: false, rmb: false };
   const table = () => Object.assign({}, COMMON, S.mode === 'racing' ? RACING : SHOOTER);
@@ -86,10 +94,13 @@
     S.keys.forEach((code) => { if (code in tb) b[tb[code]] = 1; });
     if (S.mode === 'shooter') { if (S.lmb) b[B.RT] = 1; if (S.rmb) b[B.LT] = 1; }
 
-    let lx = (S.keys.has('KeyD') ? 1 : 0) - (S.keys.has('KeyA') ? 1 : 0);
-    let ly = S.mode === 'shooter' ? (S.keys.has('KeyS') ? 1 : 0) - (S.keys.has('KeyW') ? 1 : 0) : 0;
+    // Up/down also move the stick in racing mode, so menus work with W/S and arrows.
+    let lx = (held(RIGHT_KEYS) ? 1 : 0) - (held(LEFT_KEYS) ? 1 : 0);
+    let ly = (held(DOWN_KEYS) ? 1 : 0) - (held(UP_KEYS) ? 1 : 0);
+    // Shooter: keep diagonal walk speed even. Racing: keep full steering
+    // while gas/brake is held.
     const m = Math.hypot(lx, ly);
-    if (m > 1) { lx /= m; ly /= m; }
+    if (S.mode === 'shooter' && m > 1) { lx /= m; ly /= m; }
 
     return {
       __xkgp: true,

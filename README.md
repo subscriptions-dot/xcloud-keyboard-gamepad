@@ -41,17 +41,21 @@ Use only one option. If you use the extension, turn the Tampermonkey script off.
 
 | Key | Controller |
 | --- | --- |
-| `W` | RT (gas) |
-| `S` | LT (brake / reverse) |
-| `A` / `D` | Left stick (steer) |
+`W A S D` and the arrow keys do the same thing. Use whichever you like.
+
+| Key | Controller |
+| --- | --- |
+| `W` or `↑` | RT (gas) + stick up (menus) |
+| `S` or `↓` | LT (brake / reverse) + stick down (menus) |
+| `A` / `D` or `←` / `→` | Left stick (steer, menus) |
 | `Space`, `Enter` | A |
 | `Backspace` | B |
 | `Q` | X |
 | `E` | Y |
-| `Shift` | RB (gear up) |
-| `Ctrl` | LB (gear down) |
+| `Shift` | RB |
+| `Ctrl` | LB |
 | `R` | Right stick click |
-| Arrow keys | D-pad |
+| `I` `J` `K` `L` | D-pad up / left / down / right |
 | `Tab` | Menu / Start |
 | `G` | View / Back |
 
@@ -59,7 +63,7 @@ Use only one option. If you use the extension, turn the Tampermonkey script off.
 
 | Key | Controller |
 | --- | --- |
-| `W A S D` | Left stick |
+| `W A S D` or arrow keys | Left stick |
 | Mouse | Right stick (click screen first to lock mouse) |
 | Left click | RT |
 | Right click | LT |
@@ -70,7 +74,7 @@ Use only one option. If you use the extension, turn the Tampermonkey script off.
 | `Q` / `F` | LB / RB |
 | `Shift` | Left stick click |
 | `V` | Right stick click |
-| Arrow keys, `Enter`, `Backspace`, `Tab`, `G` | same as racing |
+| `I J K L`, `Enter`, `Backspace`, `Tab`, `G` | same as racing |
 
 Tip for racing on keyboard: pick **Assisted Steering and Braking**, keyboard steering is all-or-nothing.
 
