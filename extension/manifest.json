@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "xCloud Keyboard Gamepad",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Play any Xbox Cloud Gaming game with keyboard and mouse. Virtual controller, no real gamepad needed.",
   "content_scripts": [
     {

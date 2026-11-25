@@ -16,22 +16,25 @@ Pick **one**.
 2. `chrome://extensions` > Tampermonkey > Details > turn on **Allow user scripts**.
 3. Open [`xcloud-keyboard-gamepad.user.js`](https://raw.githubusercontent.com/subscriptions-dot/xcloud-keyboard-gamepad/main/xcloud-keyboard-gamepad.user.js) and click **Install**.
 
+Tampermonkey updates it by itself from this repo.
+
 ### Option B: Chrome extension (no Tampermonkey)
 
-1. Download this repo (Code > Download ZIP) and unzip.
+1. Download `xcloud-keyboard-gamepad-extension.zip` from the [latest release](https://github.com/subscriptions-dot/xcloud-keyboard-gamepad/releases/latest) and unzip it.
 2. Open `chrome://extensions`, turn on **Developer mode**.
-3. **Load unpacked** > choose the `extension` folder.
+3. **Load unpacked** > choose the unzipped folder.
+
+Use only one option. If you use the extension, turn the Tampermonkey script off.
 
 ## Use
 
 1. Open `play.xbox.com` and start a game.
-2. Click once on the game screen.
-3. Press **`** (backtick, key under Esc). A green toast says *Keyboard gamepad ON*.
-4. If the game says "Connect a controller", it will now detect it. Press `Enter`.
+2. The virtual controller turns **ON by itself** when the game starts. A green toast says *Keyboard gamepad ON*.
+3. If the game says "Controller Disconnected" or "Connect a controller", wait 2 seconds and press `Enter`.
 
 | Key | Action |
 | --- | --- |
-| `` ` `` | Virtual controller ON / OFF |
+| `` ` `` | Virtual controller ON / OFF. Key just left of `1` (below `Esc`). On Indian/UK Mac keyboards it can be the `§` key there, both work. |
 | `\` | Switch mode: racing / shooter |
 
 ### Racing mode (default)
@@ -78,7 +81,7 @@ The new `play.xbox.com` stream client does not poll `navigator.getGamepads()` ev
 This script:
 
 1. Patches `navigator.getGamepads()` to add a virtual "standard" Xbox 360 pad driven by the keyboard and mouse.
-2. Sends a `focus` event so the Xbox UI starts tracking gamepads.
+2. Sends a `focus` event every 2 seconds while ON. The Xbox UI only tracks gamepads after a focus event, and the stream re-reads connected pads on focus (otherwise a game started later shows "Controller Disconnected").
 3. Sends `gamepadconnected`, then a `gamepadrawinputchanged` event on every key change and every frame, which is what the stream reads.
 4. Stops mapped keys from reaching the Xbox page, so `Enter` does not also open the Xbox guide.
 

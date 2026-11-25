@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xCloud Keyboard Gamepad
 // @namespace    https://github.com/subscriptions-dot/xcloud-keyboard-gamepad
-// @version      2.0.1
+// @version      2.1.0
 // @description  Play any Xbox Cloud Gaming game (play.xbox.com) with keyboard and mouse. Adds a virtual controller, no real gamepad needed.
 // @license      MIT
 // @match        https://play.xbox.com/*
@@ -25,7 +25,7 @@
  *  4. Mapped keys are stopped (stopImmediatePropagation) so the Xbox page
  *     does not also treat them as keyboard UI navigation.
  *
- * Keys:  ` (backtick) = ON/OFF     \ (backslash) = racing / shooter mode
+   * Auto ON when a game starts. Keys: ` (key left of 1, or §) = ON/OFF     \ (backslash) = racing / shooter mode
  */
 (function () {
   'use strict';
@@ -33,7 +33,8 @@
   window.__xkgp = true;
 
   const PAD_ID = 'Xbox 360 Controller (STANDARD GAMEPAD Vendor: 045e Product: 028e)';
-  const TOGGLE_KEY = 'Backquote';
+  // ` key on US keyboards; § key (same place) on Indian/UK Mac keyboards
+  const TOGGLE_KEYS = ['Backquote', 'IntlBackslash'];
   const MODE_KEY = 'Backslash';
   const MOUSE_SENS = 0.15;
 
@@ -160,15 +161,22 @@
   // The stream client re-reads connected pads on window 'focus'
   // (reconcileAndSend). A stream that starts after the pad was switched on
   // shows "Controller Disconnected" until that happens, so repeat it.
+  // Also: switch ON automatically when a game stream page opens, unless the
+  // user switched it OFF by hand on this stream.
+  let userOff = false;
+  const onStreamPage = () => /\/(stream|launch)\//.test(location.pathname);
   setInterval(() => {
+    if (!onStreamPage()) { userOff = false; return; }
+    if (!S.on && !userOff) setOn(true);
     if (!S.on) return;
     try { window.dispatchEvent(new Event('focus')); } catch (e) { /* ignore */ }
   }, 2000);
 
   // ---------- keyboard ----------
   window.addEventListener('keydown', (e) => {
-    if (e.code === TOGGLE_KEY) {
+    if (TOGGLE_KEYS.includes(e.code)) {
       setOn(!S.on);
+      userOff = !S.on;
       e.preventDefault();
       e.stopImmediatePropagation();
       return;
