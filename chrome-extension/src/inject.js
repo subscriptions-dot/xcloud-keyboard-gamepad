@@ -44,8 +44,9 @@
   const RIGHT_KEYS = ['KeyD', 'ArrowRight'];
   const STICK_KEYS = [].concat(UP_KEYS, DOWN_KEYS, LEFT_KEYS, RIGHT_KEYS);
 
-  const settings = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true };
-  const S = { on: false, mode: settings.mode, rx: 0, ry: 0, keys: new Set(), lmb: false, rmb: false };
+  const DONATE_URL = 'https://github.com/subscriptions-dot/xcloud-keyboard-gamepad#support';
+  const settings = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true, autoOk: true, donateCard: true };
+  const S = { on: false, mode: settings.mode, rx: 0, ry: 0, keys: new Set(), lmb: false, rmb: false, forceA: false };
   let userOff = false;
 
   const held = (list) => list.some((k) => S.keys.has(k));
@@ -127,6 +128,7 @@
     const b = new Array(17).fill(0);
     S.keys.forEach((code) => { if (code in tb) b[tb[code]] = 1; });
     if (S.mode === 'shooter') { if (S.lmb) b[B.RT] = 1; if (S.rmb) b[B.LT] = 1; }
+    if (S.forceA) b[B.A] = 1;
 
     let lx = (held(RIGHT_KEYS) ? 1 : 0) - (held(LEFT_KEYS) ? 1 : 0);
     let ly = (held(DOWN_KEYS) ? 1 : 0) - (held(UP_KEYS) ? 1 : 0);
@@ -218,6 +220,9 @@
       const prevMode = settings.mode;
       Object.assign(settings, d.settings);
       if (settings.mode !== prevMode) setMode(settings.mode);
+      // Started early on a game page, but the user turned auto on off.
+      if (earlyOn && !settings.autoOn && S.on) setOn(false, true);
+      earlyOn = false;
       UI.render();
     } else if (d.type === 'toggle') {
       setOn(!S.on);
@@ -234,17 +239,24 @@
   // every 2s, plus 'gamepadconnected' for the first seconds of a stream.
   let tick = 0;
   let streamTicks = 0;
+  let lastAutoOk = 0;
   setInterval(() => {
     tick++;
-    if (!onStreamPage()) { userOff = false; streamTicks = 0; }
+    if (!onStreamPage()) { userOff = false; streamTicks = 0; Donate.shownThisGame = false; }
     else {
       streamTicks++;
       if (!S.on && !userOff && settings.autoOn) setOn(true);
+      if (streamTicks === 30) Donate.maybeShow(); // ~15s into a game
     }
     if (S.on) {
       if (tick % 4 === 0) { try { window.dispatchEvent(new Event('focus')); } catch (e) { /* ignore */ } }
       if (streamTicks > 0 && streamTicks <= 40 && streamTicks % 4 === 0) {
         try { dispatchPad('gamepadconnected'); } catch (e) { /* ignore */ }
+      }
+      if (settings.autoOk && onStreamPage() && Date.now() - lastAutoOk > 4000 && Dialog.seen()) {
+        lastAutoOk = Date.now();
+        pressA();
+        UI.say('Controller reconnected');
       }
     }
     if (tick % 4 === 0) UI.render();
@@ -256,6 +268,108 @@
       try { window.dispatchEvent(new Event('focus')); dispatchPad('gamepadconnected'); } catch (e) { /* ignore */ }
     }
   });
+
+  // Tap A on the virtual pad (used to close "Controller Disconnected").
+  function pressA() {
+    try { window.dispatchEvent(new Event('focus')); dispatchPad('gamepadconnected'); } catch (e) { /* ignore */ }
+    setTimeout(() => { S.forceA = true; push(); }, 300);
+    setTimeout(() => { S.forceA = false; push(); }, 520);
+  }
+
+  // ---------------- "Controller Disconnected" detector ----------------
+  // Games draw this dialog inside the video, so it is found by looking at a
+  // tiny copy of the current frame: a wide bright-lime banner across the
+  // middle of the screen, with a dark box right under it and no lime above.
+  // (Forza Horizon style. Other games are left alone.)
+  const Dialog = {
+    c: null, ctx: null,
+    seen() {
+      const v = document.querySelector('video');
+      if (!v || v.readyState < 2 || !v.videoWidth) return false;
+      const W = 96, H = 54;
+      if (!this.c) {
+        this.c = document.createElement('canvas');
+        this.c.width = W; this.c.height = H;
+        this.ctx = this.c.getContext('2d', { willReadFrequently: true });
+      }
+      let d;
+      try {
+        this.ctx.drawImage(v, 0, 0, W, H);
+        d = this.ctx.getImageData(0, 0, W, H).data;
+      } catch (e) { return false; }
+      const px = (x, y) => { const i = (y * W + x) * 4; return [d[i], d[i + 1], d[i + 2]]; };
+      const lime = ([r, g, b]) => g > 200 && r > 150 && b < 120 && g - b > 110;
+      const lum = ([r, g, b]) => 0.3 * r + 0.59 * g + 0.11 * b;
+      const share = (y0, y1, x0, x1, test) => {
+        let n = 0, hit = 0;
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { n++; if (test(px(x, y))) hit++; }
+        return hit / n;
+      };
+      const avgLum = (y0, y1, x0, x1) => {
+        let n = 0, s = 0;
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { n++; s += lum(px(x, y)); }
+        return s / n;
+      };
+      // banner band: y 44%-49%, x 36%-64%
+      const yb0 = Math.round(H * 0.44), yb1 = Math.round(H * 0.49);
+      const xb0 = Math.round(W * 0.36), xb1 = Math.round(W * 0.64);
+      if (share(yb0, yb1, xb0, xb1, lime) < 0.5) return false; // title text is dark
+      // banner is not wider than the dialog: edges of the screen are not lime
+      if (share(yb0, yb1, 0, Math.round(W * 0.25), lime) > 0.2) return false;
+      if (share(yb0, yb1, Math.round(W * 0.75), W - 1, lime) > 0.2) return false;
+      // no lime band just above (rules out the taller menus with lime headers)
+      if (share(Math.round(H * 0.30), Math.round(H * 0.40), xb0, xb1, lime) > 0.15) return false;
+      // dark message box right under the banner
+      if (avgLum(Math.round(H * 0.52), Math.round(H * 0.55), xb0, xb1) > 110) return false;
+      return true;
+    },
+  };
+
+  // ---------------- donate card (free extension) ----------------
+  const Donate = {
+    shownThisGame: false,
+    maybeShow() {
+      if (!settings.donateCard || this.shownThisGame || !UI.ensure()) return;
+      this.shownThisGame = true;
+      const shadow = UI.root.shadowRoot;
+      let card = shadow.querySelector('.donate');
+      if (!card) {
+        const st = document.createElement('style');
+        st.textContent = `
+          .donate { position: fixed; right: 16px; bottom: 16px; width: 270px; padding: 14px; border-radius: 14px;
+            background: rgba(16,18,20,.94); border: 1px solid rgba(255,255,255,.12); color: #f2f5f7;
+            font: 13px/1.4 -apple-system, "Segoe UI", Roboto, Arial, sans-serif; box-shadow: 0 16px 40px rgba(0,0,0,.5);
+            opacity: 0; transform: translateY(10px); transition: opacity .3s ease, transform .3s ease; }
+          .donate.show { opacity: 1; transform: none; }
+          .donate b { display: block; font-size: 14px; margin-bottom: 3px; }
+          .donate p { margin: 0 0 10px; color: #a7b0b8; }
+          .donate .acts { display: flex; gap: 8px; }
+          .donate a, .donate button { flex: 1; padding: 8px 0; border-radius: 9px; font: 600 13px inherit; font-family: inherit;
+            text-align: center; cursor: pointer; text-decoration: none; border: 0; }
+          .donate a { background: #16a34a; color: #fff; }
+          .donate a:hover { background: #22c55e; }
+          .donate button { background: #2a3136; color: #dfe5ea; }
+          .donate button:hover { background: #343c42; }`;
+        shadow.appendChild(st);
+        card = document.createElement('div');
+        card.className = 'donate';
+        card.setAttribute('role', 'dialog');
+        card.innerHTML = `<b>PadKey is free</b><p>If it helps you play, a small donation keeps it alive.</p>
+          <div class="acts"><a target="_blank" rel="noopener">Donate</a><button type="button">Not now</button></div>`;
+        card.querySelector('a').href = DONATE_URL;
+        card.querySelector('button').addEventListener('click', () => card.classList.remove('show'));
+        card.querySelector('a').addEventListener('click', () => card.classList.remove('show'));
+        shadow.appendChild(card);
+      }
+      requestAnimationFrame(() => card.classList.add('show'));
+      setTimeout(() => card.classList.remove('show'), 15000);
+    },
+  };
+
+  // A game page opened directly: switch on right away (settings may still
+  // switch it off a moment later), so the game never starts without a pad.
+  let earlyOn = false;
+  if (onStreamPage()) { setOn(true, true); earlyOn = true; }
 
   // ---------------- keyboard ----------------
   window.addEventListener('keydown', (e) => {

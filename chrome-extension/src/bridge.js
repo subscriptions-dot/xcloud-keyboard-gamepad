@@ -7,7 +7,7 @@
   'use strict';
   const EXT = 'padkey-ext';
   const PAGE = 'padkey-page';
-  const DEFAULTS = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true };
+  const DEFAULTS = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true, autoOk: true, donateCard: true };
 
   let lastState = { on: false, mode: 'racing', stream: false };
 

@@ -208,6 +208,20 @@ main { padding: 0 12px; display: grid; gap: 10px; }
 .k .caps { display: flex; flex-wrap: wrap; gap: 3px; }
 .k .act { color: var(--muted); text-align: right; }
 
+/* support */
+.support { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.btn-donate {
+  flex: none;
+  padding: 8px 16px;
+  border-radius: 9px;
+  background: var(--green-d);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.btn-donate:hover { background: var(--green); }
+.btn-donate:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
 /* footer */
 .foot {
   display: flex;

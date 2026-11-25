@@ -107,3 +107,10 @@ This script:
 ## License
 
 MIT
+
+## Support
+
+PadKey is free for everyone. If it helps you play, you can support it:
+
+- ⭐ Star this repo
+- Donate: link coming soon

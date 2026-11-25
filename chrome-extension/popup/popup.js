@@ -1,6 +1,6 @@
 'use strict';
 
-const DEFAULTS = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true };
+const DEFAULTS = { autoOn: true, mode: 'racing', mouseSens: 0.15, hud: true, autoOk: true, donateCard: true };
 const XBOX_URL = /^https:\/\/(play\.xbox\.com\/|www\.xbox\.com\/[^/]+\/play)/;
 
 const KEYS = {
@@ -66,6 +66,7 @@ function renderSettings() {
     b.setAttribute('aria-checked', String(b.dataset.mode === settings.mode));
   }
   $('autoOn').checked = !!settings.autoOn;
+  $('autoOk').checked = !!settings.autoOk;
   $('hud').checked = !!settings.hud;
   const v = fromSens(settings.mouseSens);
   $('sens').value = v;
@@ -146,6 +147,7 @@ for (const b of document.querySelectorAll('.seg button')) {
 }
 
 $('autoOn').addEventListener('change', (e) => save({ autoOn: e.target.checked }));
+$('autoOk').addEventListener('change', (e) => save({ autoOk: e.target.checked }));
 $('hud').addEventListener('change', (e) => save({ hud: e.target.checked }));
 $('sens').addEventListener('input', (e) => {
   $('sensVal').textContent = e.target.value;
