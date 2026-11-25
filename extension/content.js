@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xCloud Keyboard Gamepad
 // @namespace    https://github.com/subscriptions-dot/xcloud-keyboard-gamepad
-// @version      2.0.0
+// @version      2.0.1
 // @description  Play any Xbox Cloud Gaming game (play.xbox.com) with keyboard and mouse. Adds a virtual controller, no real gamepad needed.
 // @license      MIT
 // @match        https://play.xbox.com/*
@@ -156,6 +156,14 @@
       toast('Keyboard gamepad OFF');
     }
   }
+
+  // The stream client re-reads connected pads on window 'focus'
+  // (reconcileAndSend). A stream that starts after the pad was switched on
+  // shows "Controller Disconnected" until that happens, so repeat it.
+  setInterval(() => {
+    if (!S.on) return;
+    try { window.dispatchEvent(new Event('focus')); } catch (e) { /* ignore */ }
+  }, 2000);
 
   // ---------- keyboard ----------
   window.addEventListener('keydown', (e) => {
