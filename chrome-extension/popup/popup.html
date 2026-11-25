@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PadKey</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <img src="../icons/icon48.png" alt="" class="logo" width="28" height="28">
+    <div class="brand">
+      <div class="name">PadKey</div>
+      <div class="sub">Keyboard &amp; mouse controller</div>
+    </div>
+    <span id="chip" class="chip">…</span>
+  </header>
+
+  <main>
+    <section id="live" class="card hidden">
+      <button id="power" class="power" type="button" aria-pressed="false">
+        <span class="power-dot"></span>
+        <span class="power-text">
+          <span id="powerTitle" class="power-title">Controller off</span>
+          <span id="powerHint" class="power-hint">Click or press <kbd>`</kbd> in the game</span>
+        </span>
+      </button>
+    </section>
+
+    <section id="away" class="card away hidden">
+      <p>Open Xbox Cloud Gaming and start a game. PadKey turns on by itself.</p>
+      <a id="open" class="btn-primary" href="https://play.xbox.com/" target="_blank" rel="noopener">Open play.xbox.com</a>
+    </section>
+
+    <section class="card">
+      <div class="label">Mode</div>
+      <div class="seg" role="radiogroup" aria-label="Mode">
+        <button type="button" role="radio" data-mode="racing">Racing</button>
+        <button type="button" role="radio" data-mode="shooter">Shooter</button>
+      </div>
+
+      <label class="row">
+        <span>
+          <span class="row-title">Auto on</span>
+          <span class="row-sub">Turn on when a game starts</span>
+        </span>
+        <input id="autoOn" type="checkbox" class="switch">
+      </label>
+
+      <label class="row">
+        <span>
+          <span class="row-title">On-screen badge</span>
+          <span class="row-sub">Small status pill in the game</span>
+        </span>
+        <input id="hud" type="checkbox" class="switch">
+      </label>
+
+      <div class="row col" id="sensRow">
+        <div class="row-head">
+          <span class="row-title">Mouse sensitivity</span>
+          <span id="sensVal" class="row-val">5</span>
+        </div>
+        <input id="sens" type="range" min="1" max="10" step="1" class="range">
+        <span class="row-sub">Shooter mode, mouse = right stick</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="label">Keys · <span id="keysMode">Racing</span></div>
+      <div id="keys" class="keys"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span><kbd>`</kbd> on/off &nbsp;<kbd>\</kbd> mode</span>
+    <a href="https://github.com/subscriptions-dot/xcloud-keyboard-gamepad" target="_blank" rel="noopener">Help</a>
+  </footer>
+  <p class="legal">Not affiliated with Microsoft or Xbox.</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

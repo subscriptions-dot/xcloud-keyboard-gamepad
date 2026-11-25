@@ -1,4 +1,6 @@
-# xCloud Keyboard Gamepad
+# PadKey (xCloud Keyboard Gamepad)
+
+![PadKey](store/screenshot1.png)
 
 Play **any** Xbox Cloud Gaming game on `play.xbox.com` with keyboard and mouse, even games that need a controller (Forza Horizon 6, etc.). It adds a virtual Xbox controller in the browser. No real gamepad, no extra app.
 
@@ -10,7 +12,17 @@ Tested in Chrome on macOS with the new `play.xbox.com` client (2026).
 
 Pick **one**.
 
-### Option A: Tampermonkey (userscript)
+### Option A: PadKey Chrome extension (recommended)
+
+Settings popup, on-screen badge, mouse sensitivity, auto on.
+
+1. Download `padkey-chrome-<version>.zip` from the [latest release](https://github.com/subscriptions-dot/xcloud-keyboard-gamepad/releases/latest) and unzip it.
+2. Open `chrome://extensions`, turn on **Developer mode**.
+3. **Load unpacked** > choose the unzipped folder.
+
+Source: [`chrome-extension/`](chrome-extension). Chrome Web Store listing: coming soon.
+
+### Option B: Tampermonkey (userscript)
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) in Chrome.
 2. `chrome://extensions` > Tampermonkey > Details > turn on **Allow user scripts**.
@@ -18,13 +30,9 @@ Pick **one**.
 
 Tampermonkey updates it by itself from this repo.
 
-### Option B: Chrome extension (no Tampermonkey)
-
-1. Download `xcloud-keyboard-gamepad-extension.zip` from the [latest release](https://github.com/subscriptions-dot/xcloud-keyboard-gamepad/releases/latest) and unzip it.
-2. Open `chrome://extensions`, turn on **Developer mode**.
-3. **Load unpacked** > choose the unzipped folder.
-
 Use only one option. If you use the extension, turn the Tampermonkey script off.
+
+Privacy: [PRIVACY.md](PRIVACY.md). PadKey collects no data.
 
 ## Use
 

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>shot2</title><link rel="stylesheet" href="shots.css">
+<style>
+  .center { height: 100%; display: grid; place-items: center; text-align: center; padding: 60px 90px; }
+  h1 { font-size: 46px; margin-bottom: 10px; }
+  p.lead { margin: 0 auto 40px; }
+  .pads { display: flex; gap: 90px; justify-content: center; align-items: flex-end; }
+  .cluster { display: grid; grid-template-columns: repeat(3, 78px); gap: 10px; justify-content: center; }
+  .cluster .sp { visibility: hidden; }
+  .or { font-size: 22px; color: #5c666f; font-weight: 700; align-self: center; }
+  .labels { display: flex; gap: 26px; justify-content: center; margin-top: 46px; flex-wrap: wrap; }
+  .tag { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 12px; background: #151a1d; border: 1px solid #262c31; font-size: 18px; color: #dfe5ea; }
+  .tag kbd { font: 700 15px ui-monospace, Menlo, monospace; padding: 3px 9px; border-radius: 7px; background: #1d3a27; border: 1px solid #22c55e; color: #eafff1; }
+</style></head>
+<body>
+  <div class="center">
+    <div>
+      <h1>Drive with <em>W A S D</em> or the <em>arrow keys</em></h1>
+      <p class="lead">Racing layout: full steering while you hold the gas.</p>
+      <div class="pads">
+        <div>
+          <div class="cluster">
+            <kbd class="big sp">.</kbd><kbd class="big hot">W</kbd><kbd class="big sp">.</kbd>
+            <kbd class="big hot">A</kbd><kbd class="big hot">S</kbd><kbd class="big hot">D</kbd>
+          </div>
+        </div>
+        <div class="or">or</div>
+        <div>
+          <div class="cluster">
+            <kbd class="big sp">.</kbd><kbd class="big hot">↑</kbd><kbd class="big sp">.</kbd>
+            <kbd class="big hot">←</kbd><kbd class="big hot">↓</kbd><kbd class="big hot">→</kbd>
+          </div>
+        </div>
+      </div>
+      <div class="labels">
+        <span class="tag"><kbd>W ↑</kbd> Gas</span>
+        <span class="tag"><kbd>S ↓</kbd> Brake / reverse</span>
+        <span class="tag"><kbd>A D ← →</kbd> Steer</span>
+        <span class="tag"><kbd>Space</kbd> Handbrake</span>
+        <span class="tag"><kbd>E</kbd> Rewind</span>
+        <span class="tag"><kbd>Tab</kbd> Pause</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Not affiliated with Microsoft or Xbox.</div>
+</body></html>

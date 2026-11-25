@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PadKey popup preview</title>
+  <link rel="stylesheet" href="../../chrome-extension/popup/popup.css">
+  <script>
+    // Stub of the chrome.* APIs so the real popup renders for screenshots.
+    const q = new URLSearchParams(location.search);
+    const mode = q.get('mode') || 'racing';
+    window.chrome = {
+      runtime: { lastError: null },
+      storage: { sync: { get: (d) => Promise.resolve({ ...d, mode }), set() {} } },
+      tabs: {
+        query: async () => [{ id: 1, url: 'https://play.xbox.com/stream/x' }],
+        sendMessage: (_id, _m, cb) => cb({ on: true, mode, stream: true }),
+      },
+    };
+  </script>
+</head>
+<body>
+  <!-- popup markup is fetched from the real file below -->
+  <script>
+    fetch('../../chrome-extension/popup/popup.html').then((r) => r.text()).then((html) => {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      document.body.innerHTML = doc.body.innerHTML.replace(/<script[\s\S]*?<\/script>/g, '');
+      document.querySelector('.logo').src = '../../chrome-extension/icons/icon48.png';
+      const s = document.createElement('script');
+      s.src = '../../chrome-extension/popup/popup.js';
+      document.body.appendChild(s);
+    });
+  </script>
+</body>
+</html>
